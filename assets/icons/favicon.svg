@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="時継舎 favicon">
+  <rect width="64" height="64" rx="14" fill="#f4eddf"/>
+  <circle cx="32" cy="32" r="22" fill="none" stroke="#0c2348" stroke-width="4"/>
+  <circle cx="32" cy="32" r="2.8" fill="#0c2348"/>
+  <path d="M32 18v14l9 7" fill="none" stroke="#0c2348" stroke-linecap="round" stroke-linejoin="round" stroke-width="4.5"/>
+  <path d="M15 49c5-4 10-6 17-6s12 2 17 6" fill="none" stroke="#7186a3" stroke-linecap="round" stroke-width="3" opacity="0.8"/>
+</svg>
