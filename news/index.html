@@ -4,7 +4,92 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>お知らせ | 時継舎</title>
+    <meta
+      name="description"
+      content="時継舎からのお知らせや更新情報を掲載するページです。新しいご案内がありましたら、こちらでお伝えします。"
+    >
+    <link rel="stylesheet" href="../assets/css/style.css">
   </head>
-  <body>
+  <body data-page="news">
+    <div class="page-shell">
+      <header class="site-header">
+        <div class="site-header__inner">
+          <a class="site-brand" href="../" aria-label="時継舎 ホーム">
+            <span class="site-brand__mark" aria-hidden="true">時</span>
+            <span class="site-brand__name">時継舎</span>
+          </a>
+          <nav class="site-nav" aria-label="主要メニュー">
+            <ul class="site-nav__list">
+              <li><a href="../">ホーム</a></li>
+              <li><a href="../items/">品を見る</a></li>
+              <li><a href="../about/">時継舎について</a></li>
+              <li><a href="../owner/">店主のこと</a></li>
+              <li><a class="is-current" href="./">お知らせ</a></li>
+              <li><a href="../contact/">お問い合わせ</a></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section class="subhero" aria-labelledby="news-page-title">
+          <div class="subhero__watercolor subhero__watercolor--left" aria-hidden="true"></div>
+          <div class="subhero__watercolor subhero__watercolor--right" aria-hidden="true"></div>
+          <div class="section-frame subhero__inner">
+            <p class="subhero__eyebrow">とぎつぎしゃ</p>
+            <h1 class="subhero__title" id="news-page-title">お知らせ</h1>
+            <p class="subhero__lead">
+              時継舎からのご案内や更新情報を、
+              落ち着いて読みやすい形でお伝えしていくページです。
+            </p>
+            <p class="subhero__text">
+              新しいお知らせがありましたら、こちらで順次ご案内いたします。
+            </p>
+          </div>
+        </section>
+
+        <section class="news-page" aria-labelledby="news-list-title">
+          <div class="section-frame news-page__inner">
+            <section class="news-page__panel">
+              <div class="section-heading section-heading--lined section-heading--stacked">
+                <h2 id="news-list-title">お知らせ一覧</h2>
+                <p>更新情報やご案内を、日付とあわせて静かにお伝えします。</p>
+              </div>
+
+              <div class="news-page__status" id="news-status" aria-live="polite">
+                <p class="news-page__status-title">現在、お知らせはありません。</p>
+                <p class="news-page__status-text">
+                  新しいお知らせがありましたら、こちらでご案内いたします。
+                </p>
+              </div>
+
+              <div class="news-page__list" id="news-page-list">
+                <article class="news-entry news-entry--empty">
+                  <div class="news-entry__body">
+                    <h3>現在、お知らせはありません。</h3>
+                    <p>新しいお知らせがありましたら、こちらでご案内いたします。</p>
+                  </div>
+                </article>
+              </div>
+            </section>
+
+            <a class="subhero__backlink" href="../">トップへ戻る</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="site-footer__inner">
+          <nav class="site-footer__nav" aria-label="補助メニュー">
+            <a href="../">ホーム</a>
+            <a href="../items/">品を見る</a>
+            <a href="../about/">時継舎について</a>
+            <a href="../contact/">お問い合わせ</a>
+          </nav>
+          <p class="site-footer__copyright">© 2026 時継舎</p>
+        </div>
+      </footer>
+    </div>
+    <script src="../assets/js/main.js"></script>
   </body>
 </html>

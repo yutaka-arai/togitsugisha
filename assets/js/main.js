@@ -81,6 +81,18 @@ function renderHomeItems(items) {
     .join("");
 }
 
+function formatDisplayDate(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return escapeHtml(value);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+}
+
 function renderNews(items) {
   const container = document.getElementById("news-list");
   if (!container) return;
@@ -90,11 +102,72 @@ function renderNews(items) {
     .slice(0, 3)
     .map((entry) => {
       const text = escapeHtml(entry.text || entry.title || "ただいまホームページを準備しています。");
+      const displayDate = formatDisplayDate(entry.date);
       return `
         <li class="news-list__item${entry.date ? "" : " news-list__item--waiting"}">
-          ${entry.date ? `<time datetime="${escapeHtml(entry.date)}">${escapeHtml(entry.date)}</time>` : ""}
+          ${entry.date ? `<time datetime="${escapeHtml(entry.date)}">${displayDate}</time>` : ""}
           <p>${text}</p>
         </li>
+      `;
+    })
+    .join("");
+}
+
+function renderNewsPageEmpty(message) {
+  const status = document.getElementById("news-status");
+  const list = document.getElementById("news-page-list");
+  if (!status || !list) return;
+
+  status.innerHTML = `
+    <p class="news-page__status-title">${escapeHtml(message.title)}</p>
+    <p class="news-page__status-text">${escapeHtml(message.text)}</p>
+  `;
+
+  list.innerHTML = `
+    <article class="news-entry news-entry--empty">
+      <div class="news-entry__body">
+        <h3>${escapeHtml(message.title)}</h3>
+        <p>${escapeHtml(message.text)}</p>
+      </div>
+    </article>
+  `;
+}
+
+function renderNewsPage(items) {
+  const status = document.getElementById("news-status");
+  const list = document.getElementById("news-page-list");
+  if (!status || !list) return;
+
+  if (!Array.isArray(items) || items.length === 0) {
+    renderNewsPageEmpty({
+      title: "現在、お知らせはありません。",
+      text: "新しいお知らせがありましたら、こちらでご案内いたします。"
+    });
+    return;
+  }
+
+  status.innerHTML = `
+    <p class="news-page__status-title">新しいご案内を掲載しています。</p>
+    <p class="news-page__status-text">更新がありましたら、日付とあわせてこちらへ掲載します。</p>
+  `;
+
+  list.innerHTML = items
+    .map((entry) => {
+      const date = entry.date ? `<time class="news-entry__date" datetime="${escapeHtml(entry.date)}">${formatDisplayDate(entry.date)}</time>` : "";
+      const category = entry.category ? `<span class="news-entry__category">${escapeHtml(entry.category)}</span>` : "";
+      const title = escapeHtml(entry.title || "お知らせ");
+      const body = escapeHtml(entry.body || entry.text || "詳細は順次ご案内いたします。");
+      return `
+        <article class="news-entry">
+          <div class="news-entry__meta">
+            ${date}
+            ${category}
+          </div>
+          <div class="news-entry__body">
+            <h3>${title}</h3>
+            <p>${body}</p>
+          </div>
+        </article>
       `;
     })
     .join("");
@@ -278,10 +351,31 @@ async function bootstrapItemsPage() {
   }
 }
 
+function getNewsDataPath() {
+  const url = new URL(window.location.href);
+  return url.searchParams.get("newsDataPath") || "../data/news.json";
+}
+
+async function bootstrapNewsPage() {
+  try {
+    const news = await readJson(getNewsDataPath());
+    renderNewsPage(news);
+  } catch {
+    renderNewsPageEmpty({
+      title: "お知らせの情報を準備しています。",
+      text: "しばらくしてからご覧ください。"
+    });
+  }
+}
+
 function bootstrap() {
   const page = document.body.dataset.page || "home";
   if (page === "items") {
     bootstrapItemsPage();
+    return;
+  }
+  if (page === "news") {
+    bootstrapNewsPage();
     return;
   }
   bootstrapHomePage();

@@ -1354,3 +1354,123 @@ img {
     font-size: 1rem;
   }
 }
+
+
+.news-page {
+  padding: 0.4rem 0 3rem;
+}
+
+.news-page__inner {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.news-page__panel {
+  padding: 1.8rem 1.6rem;
+  border: 1px solid rgba(24, 55, 95, 0.12);
+  background: rgba(255, 253, 247, 0.6);
+  box-shadow: 0 16px 36px rgba(20, 31, 49, 0.05);
+}
+
+.news-page__status {
+  margin-top: 1.3rem;
+  padding: 1.4rem 1.2rem;
+  border-left: 3px solid rgba(24, 55, 95, 0.35);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.news-page__status-title,
+.news-page__status-text {
+  margin: 0;
+}
+
+.news-page__status-title {
+  color: var(--color-indigo-deep);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 700;
+}
+
+.news-page__status-text {
+  margin-top: 0.55rem;
+  font-size: 1.08rem;
+}
+
+.news-page__list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.news-entry {
+  padding: 1.35rem 1.25rem;
+  border: 1px solid rgba(24, 55, 95, 0.12);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.news-entry__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1rem;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.news-entry__date,
+.news-entry__category {
+  color: var(--color-indigo-deep);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.news-entry__category {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid rgba(24, 55, 95, 0.18);
+}
+
+.news-entry__body h3 {
+  margin: 0;
+  color: var(--color-indigo-deep);
+  font-size: 1.45rem;
+  line-height: 1.5;
+}
+
+.news-entry__body p {
+  margin: 0.65rem 0 0;
+  font-size: 1.05rem;
+}
+
+.news-entry--empty {
+  background: rgba(255, 253, 247, 0.72);
+}
+
+@media (max-width: 760px) {
+  .news-page__panel {
+    padding: 1.3rem 1rem;
+  }
+
+  .news-page__status {
+    padding: 1.15rem 1rem;
+  }
+
+  .news-page__status-title {
+    font-size: 1.35rem;
+  }
+
+  .news-page__status-text,
+  .news-entry__body p,
+  .news-entry__date,
+  .news-entry__category {
+    font-size: 1rem;
+  }
+
+  .news-entry {
+    padding: 1.1rem 1rem;
+  }
+
+  .news-entry__body h3 {
+    font-size: 1.24rem;
+  }
+}
