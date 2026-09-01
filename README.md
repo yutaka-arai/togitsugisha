@@ -86,3 +86,47 @@ togitsugisha/
 6. 公開後の確認
    - PC とスマートフォンでナビゲーション、文字サイズ、リンク切れ、JSON 読み込みを確認する
 
+## Cloudflare公開手順
+
+1. 依存関係インストール
+   npm install
+
+2. Cloudflareログイン
+   npx wrangler login
+
+3. 認証確認
+   npx wrangler whoami
+
+4. 公開用静的ファイル生成
+   npm run build
+
+5. ローカル確認
+   npx wrangler dev
+
+6. 本番公開
+   npx wrangler deploy
+
+7. 公開URL
+   https://togitsugisha.togitsugisha.workers.dev/
+
+## 構成
+
+- Workers Sitesは使用しない
+- Workers Static Assetsを使用
+- 公開用ディレクトリ:
+  .cloudflare-static
+- .cloudflare-static はGit管理しない
+- 公開用ファイルは npm run build で生成
+- wrangler はプロジェクトローカル管理
+- 現在のWrangler:
+  4.86.0
+- Node.js:
+  v20.20.2
+
+## 注意
+
+- API TokenをREADMEや.envへ記載しない
+- Cloudflare OAuth認証を使用する
+- D1/R2/KVは現時点では未使用
+- 独自ドメインはまだ設定しない
+
