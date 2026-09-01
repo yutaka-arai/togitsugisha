@@ -4,7 +4,145 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>品を見る | 時継舎</title>
+    <meta
+      name="description"
+      content="時継舎で扱う日本の古物を紹介する一覧ページです。古時計、器、古道具、古布などの掲載準備状況をご案内します。"
+    >
+    <link rel="stylesheet" href="../assets/css/style.css">
   </head>
-  <body>
+  <body data-page="items">
+    <div class="page-shell">
+      <header class="site-header">
+        <div class="site-header__inner">
+          <a class="site-brand" href="../" aria-label="時継舎 ホーム">
+            <span class="site-brand__mark" aria-hidden="true">時</span>
+            <span class="site-brand__name">時継舎</span>
+          </a>
+          <nav class="site-nav" aria-label="主要メニュー">
+            <ul class="site-nav__list">
+              <li><a href="../">ホーム</a></li>
+              <li><a class="is-current" href="./">品を見る</a></li>
+              <li><a href="../about/">時継舎について</a></li>
+              <li><a href="../owner/">店主のこと</a></li>
+              <li><a href="../news/">お知らせ</a></li>
+              <li><a href="../contact/">お問い合わせ</a></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section class="subhero" aria-labelledby="items-page-title">
+          <div class="subhero__watercolor subhero__watercolor--left" aria-hidden="true"></div>
+          <div class="subhero__watercolor subhero__watercolor--right" aria-hidden="true"></div>
+          <div class="section-frame subhero__inner">
+            <p class="subhero__eyebrow">とぎつぎしゃ</p>
+            <h1 class="subhero__title" id="items-page-title">品を見る</h1>
+            <p class="subhero__lead">
+              時継舎で扱う日本の古物を、
+              分野ごとに静かにご覧いただくためのページです。
+            </p>
+            <p class="subhero__text">
+              古時計、器・陶磁器、古道具、古布・染織など、
+              大切に受け継がれてきた品々を、順次ご紹介してまいります。
+            </p>
+            <a class="subhero__backlink" href="../">トップへ戻る</a>
+          </div>
+        </section>
+
+        <section class="items-categories" aria-labelledby="items-categories-title">
+          <div class="section-frame">
+            <div class="section-heading section-heading--lined section-heading--stacked">
+              <h2 id="items-categories-title">カテゴリから見る</h2>
+              <p>気になる分野から、今後の掲載内容をご覧いただけます。</p>
+            </div>
+            <div class="category-grid category-grid--items">
+              <a class="category-card" href="#clock">
+                <span class="category-card__icon" aria-hidden="true">時</span>
+                <span class="category-card__label">古時計</span>
+              </a>
+              <a class="category-card" href="#ceramics">
+                <span class="category-card__icon" aria-hidden="true">器</span>
+                <span class="category-card__label">器・陶磁器</span>
+              </a>
+              <a class="category-card" href="#tools">
+                <span class="category-card__icon" aria-hidden="true">道</span>
+                <span class="category-card__label">古道具</span>
+              </a>
+              <a class="category-card" href="#textiles">
+                <span class="category-card__icon" aria-hidden="true">布</span>
+                <span class="category-card__label">古布・染織</span>
+              </a>
+              <a class="category-card" href="#others">
+                <span class="category-card__icon" aria-hidden="true">余</span>
+                <span class="category-card__label">その他</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="items-board" aria-labelledby="items-board-title">
+          <div class="section-frame">
+            <div class="section-heading section-heading--lined section-heading--stacked">
+              <h2 id="items-board-title">品物一覧</h2>
+              <p>現在ご案内できる内容を掲載します。掲載前の段階でも、準備状況が分かるように表示します。</p>
+            </div>
+
+            <div class="items-status" id="items-status" aria-live="polite">
+              <div class="items-status__copy">
+                <p class="items-status__title">品物はただいま準備中です</p>
+                <p class="items-status__lead">写真と詳細は順次掲載いたします。</p>
+              </div>
+            </div>
+
+            <div class="items-catalog" id="items-catalog">
+              <section class="items-group" id="clock" aria-labelledby="clock-title">
+                <div class="items-group__heading">
+                  <h3 id="clock-title">古時計</h3>
+                  <p>掲載準備中</p>
+                </div>
+              </section>
+              <section class="items-group" id="ceramics" aria-labelledby="ceramics-title">
+                <div class="items-group__heading">
+                  <h3 id="ceramics-title">器・陶磁器</h3>
+                  <p>掲載準備中</p>
+                </div>
+              </section>
+              <section class="items-group" id="tools" aria-labelledby="tools-title">
+                <div class="items-group__heading">
+                  <h3 id="tools-title">古道具</h3>
+                  <p>掲載準備中</p>
+                </div>
+              </section>
+              <section class="items-group" id="textiles" aria-labelledby="textiles-title">
+                <div class="items-group__heading">
+                  <h3 id="textiles-title">古布・染織</h3>
+                  <p>掲載準備中</p>
+                </div>
+              </section>
+              <section class="items-group" id="others" aria-labelledby="others-title">
+                <div class="items-group__heading">
+                  <h3 id="others-title">その他</h3>
+                  <p>掲載準備中</p>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="site-footer__inner">
+          <nav class="site-footer__nav" aria-label="補助メニュー">
+            <a href="../">ホーム</a>
+            <a href="../about/">時継舎について</a>
+            <a href="../contact/">お問い合わせ</a>
+            <a href="../news/">お知らせ</a>
+          </nav>
+          <p class="site-footer__copyright">© 2026 時継舎</p>
+        </div>
+      </footer>
+    </div>
+    <script src="../assets/js/main.js"></script>
   </body>
 </html>

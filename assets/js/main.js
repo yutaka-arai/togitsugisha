@@ -4,6 +4,14 @@ const waitingNews = [
   }
 ];
 
+const itemCategories = [
+  { id: "clock", label: "古時計", icon: "時" },
+  { id: "ceramics", label: "器・陶磁器", icon: "器" },
+  { id: "tools", label: "古道具", icon: "道" },
+  { id: "textiles", label: "古布・染織", icon: "布" },
+  { id: "others", label: "その他", icon: "余" }
+];
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -13,7 +21,7 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function renderWaitingItems() {
+function renderHomeWaitingItems() {
   const container = document.getElementById("item-grid");
   if (!container) return;
 
@@ -48,9 +56,9 @@ function renderWaitingItems() {
   `;
 }
 
-function renderItems(items) {
+function renderHomeItems(items) {
   if (!Array.isArray(items) || items.length === 0) {
-    renderWaitingItems();
+    renderHomeWaitingItems();
     return;
   }
 
@@ -92,6 +100,141 @@ function renderNews(items) {
     .join("");
 }
 
+function normalizeCategory(value) {
+  const text = String(value || "").trim().toLowerCase();
+  if (["clock", "古時計"].includes(text)) return "clock";
+  if (["ceramics", "器", "陶磁器", "器・陶磁器"].includes(text)) return "ceramics";
+  if (["tools", "古道具", "道具"].includes(text)) return "tools";
+  if (["textiles", "古布", "染織", "古布・染織"].includes(text)) return "textiles";
+  if (["others", "other", "その他"].includes(text)) return "others";
+  return "others";
+}
+
+function renderItemsPageWaiting(message) {
+  const status = document.getElementById("items-status");
+  const catalog = document.getElementById("items-catalog");
+  if (!status || !catalog) return;
+
+  status.innerHTML = `
+    <div class="items-status__copy">
+      <p class="items-status__title">${escapeHtml(message.title)}</p>
+      <p class="items-status__lead">${escapeHtml(message.lead)}</p>
+      ${message.text ? `<p class="items-status__text">${escapeHtml(message.text)}</p>` : ""}
+    </div>
+  `;
+
+  catalog.innerHTML = itemCategories
+    .map((category) => `
+      <section class="items-group" id="${category.id}" aria-labelledby="${category.id}-title">
+        <div class="items-group__heading">
+          <h3 id="${category.id}-title">${category.label}</h3>
+          <p>掲載準備中</p>
+        </div>
+        <div class="items-group__empty">
+          <div class="items-group__copy">
+            <p class="is-strong">品物はただいま準備中です</p>
+            <p>写真と詳細は順次掲載いたします。</p>
+            <p>この欄では、${category.label}に関する内容を今後ご案内します。</p>
+          </div>
+          <div class="items-group__decor" aria-label="${category.label}の装飾イメージ">
+            <article class="items-group__ornament">
+              <span aria-hidden="true">${category.icon}</span>
+              <h4>${category.label}</h4>
+              <p>装飾イメージ</p>
+            </article>
+            <article class="items-group__ornament">
+              <span aria-hidden="true">継</span>
+              <h4>掲載準備中</h4>
+              <p>詳細は順次ご案内いたします。</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    `)
+    .join("");
+}
+
+function renderItemsPage(items) {
+  const status = document.getElementById("items-status");
+  const catalog = document.getElementById("items-catalog");
+  if (!status || !catalog) return;
+
+  if (!Array.isArray(items) || items.length === 0) {
+    renderItemsPageWaiting({
+      title: "品物はただいま準備中です",
+      lead: "写真と詳細は順次掲載いたします。",
+      text: "掲載前の段階でも、分野ごとの準備状況が分かるようにご案内しています。"
+    });
+    return;
+  }
+
+  status.innerHTML = `
+    <div class="items-status__copy">
+      <p class="items-status__title">現在ご案内中の品物</p>
+      <p class="items-status__lead">分野ごとに一覧でご覧いただけます。</p>
+    </div>
+  `;
+
+  const grouped = new Map(itemCategories.map((category) => [category.id, []]));
+  for (const item of items) {
+    grouped.get(normalizeCategory(item.category)).push(item);
+  }
+
+  catalog.innerHTML = itemCategories
+    .map((category) => {
+      const entries = grouped.get(category.id) || [];
+      if (entries.length === 0) {
+        return `
+          <section class="items-group" id="${category.id}" aria-labelledby="${category.id}-title">
+            <div class="items-group__heading">
+              <h3 id="${category.id}-title">${category.label}</h3>
+              <p>掲載準備中</p>
+            </div>
+            <div class="items-group__empty">
+              <div class="items-group__copy">
+                <p class="is-strong">この分野の掲載は準備中です</p>
+                <p>写真と詳細は順次掲載いたします。</p>
+              </div>
+              <div class="items-group__decor" aria-label="${category.label}の装飾イメージ">
+                <article class="items-group__ornament">
+                  <span aria-hidden="true">${category.icon}</span>
+                  <h4>${category.label}</h4>
+                  <p>装飾イメージ</p>
+                </article>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      return `
+        <section class="items-group" id="${category.id}" aria-labelledby="${category.id}-title">
+          <div class="items-group__heading">
+            <h3 id="${category.id}-title">${category.label}</h3>
+            <p>${entries.length}件</p>
+          </div>
+          <div class="items-card-grid">
+            ${entries.map((item) => {
+              const title = escapeHtml(item.name || "名称準備中");
+              const description = escapeHtml(item.description || "詳細は順次掲載いたします。");
+              const price = item.price ? `<p class="items-entry__meta">価格: ${escapeHtml(item.price)}</p>` : "";
+              const statusText = escapeHtml(item.status || "掲載中");
+              return `
+                <article class="items-entry">
+                  <span class="items-entry__status">${statusText}</span>
+                  <h4>${title}</h4>
+                  ${price}
+                  <p class="items-entry__description">${description}</p>
+                </article>
+              `;
+            }).join("")}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+}
+
 async function readJson(path) {
   const response = await fetch(path, { cache: "no-store" });
   if (!response.ok) {
@@ -107,13 +250,41 @@ async function bootstrapHomePage() {
       readJson("data/news.json")
     ]);
 
-    renderItems(items);
+    renderHomeItems(items);
     renderNews(news);
   } catch (error) {
     console.warn("JSON data could not be loaded. Waiting-state content is used.", error);
-    renderWaitingItems();
+    renderHomeWaitingItems();
     renderNews(waitingNews);
   }
 }
 
-bootstrapHomePage();
+function getItemsDataPath() {
+  const url = new URL(window.location.href);
+  return url.searchParams.get("itemsDataPath") || "../data/items.json";
+}
+
+async function bootstrapItemsPage() {
+  try {
+    const items = await readJson(getItemsDataPath());
+    renderItemsPage(items);
+  } catch (error) {
+    console.warn("Item data could not be loaded. Waiting-state content is used.", error);
+    renderItemsPageWaiting({
+      title: "品物の情報を準備しています",
+      lead: "写真と詳細は順次掲載いたします。",
+      text: "ただいま掲載内容を整えています。しばらくしてからご覧ください。"
+    });
+  }
+}
+
+function bootstrap() {
+  const page = document.body.dataset.page || "home";
+  if (page === "items") {
+    bootstrapItemsPage();
+    return;
+  }
+  bootstrapHomePage();
+}
+
+bootstrap();
