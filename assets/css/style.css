@@ -105,6 +105,18 @@ img {
   color: var(--color-indigo-deep);
 }
 
+.site-brand__copy {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.site-brand__ruby {
+  font-size: 0.84rem;
+  line-height: 1;
+  letter-spacing: 0.24em;
+  padding-left: 0.18rem;
+}
+
 .site-brand__mark {
   width: 3rem;
   height: 3rem;
@@ -117,6 +129,7 @@ img {
 }
 
 .site-brand__name {
+  display: block;
   font-size: clamp(2rem, 3vw, 3.3rem);
   line-height: 1;
   letter-spacing: 0.08em;
@@ -156,8 +169,22 @@ img {
 
 .site-nav a:hover::after,
 .site-nav a:focus-visible::after,
-.site-nav .is-current::after {
+.site-nav .is-current::after,
+.site-nav a[aria-current="page"]::after {
   transform: scaleX(1);
+}
+
+.site-nav a:focus-visible,
+.site-footer__nav a:focus-visible,
+.button-link:focus-visible,
+.section-link:focus-visible,
+.subhero__backlink:focus-visible,
+.about-action:focus-visible,
+.owner-action:focus-visible,
+.contact-action:focus-visible,
+.category-card:focus-visible {
+  outline: 2px solid rgba(24, 55, 95, 0.62);
+  outline-offset: 4px;
 }
 
 .hero {
@@ -650,6 +677,11 @@ img {
   .site-header__inner {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .site-brand__ruby {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
   }
 
   .site-nav__list {
@@ -1472,5 +1504,133 @@ img {
 
   .news-entry__body h3 {
     font-size: 1.24rem;
+  }
+}
+
+
+.contact-page {
+  padding: 0.4rem 0 3rem;
+}
+
+.contact-page__inner {
+  display: grid;
+  gap: 1.6rem;
+}
+
+.contact-panel,
+.contact-links {
+  padding: 1.8rem 1.6rem;
+  border: 1px solid rgba(24, 55, 95, 0.12);
+  background: rgba(255, 253, 247, 0.6);
+  box-shadow: 0 16px 36px rgba(20, 31, 49, 0.05);
+}
+
+.contact-panel--soft {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.contact-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.3rem;
+}
+
+.contact-list__item {
+  padding: 1rem 1rem 1.05rem;
+  border-left: 3px solid rgba(24, 55, 95, 0.35);
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.contact-list__item h3,
+.contact-panel h2,
+.contact-links h2 {
+  margin: 0;
+  color: var(--color-indigo-deep);
+}
+
+.contact-list__item h3 {
+  font-size: 1.32rem;
+  line-height: 1.5;
+}
+
+.contact-list__item p,
+.contact-copy-flow p,
+.contact-panel p {
+  margin: 0.55rem 0 0;
+  font-size: 1.06rem;
+}
+
+.contact-copy-flow p:first-child,
+.contact-panel p:first-of-type {
+  margin-top: 1rem;
+}
+
+.contact-copy-flow p + p,
+.contact-panel p + p {
+  margin-top: 0.9rem;
+}
+
+.contact-panel__lead {
+  color: var(--color-indigo-deep);
+  font-size: 1.22rem !important;
+  font-weight: 700;
+}
+
+.contact-links__actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.contact-action {
+  display: grid;
+  gap: 0.5rem;
+  min-height: 9rem;
+  padding: 1.2rem 1.1rem;
+  border: 1px solid rgba(24, 55, 95, 0.18);
+  background: rgba(255, 255, 255, 0.36);
+  color: var(--color-indigo-deep);
+}
+
+.contact-action strong {
+  font-size: 1.3rem;
+}
+
+.contact-action span {
+  font-size: 1.02rem;
+  line-height: 1.8;
+}
+
+.contact-action:hover,
+.contact-action:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 1100px) {
+  .contact-links__actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .contact-panel,
+  .contact-links {
+    padding: 1.3rem 1rem;
+  }
+
+  .contact-list__item h3,
+  .contact-panel h2,
+  .contact-links h2,
+  .contact-action strong {
+    font-size: 1.2rem;
+  }
+
+  .contact-list__item p,
+  .contact-copy-flow p,
+  .contact-panel p,
+  .contact-action span {
+    font-size: 1rem;
   }
 }

@@ -369,16 +369,18 @@ async function bootstrapNewsPage() {
 }
 
 function bootstrap() {
-  const page = document.body.dataset.page || "home";
+  const page = document.body.dataset.page;
+  if (page === "home") {
+    bootstrapHomePage();
+    return;
+  }
   if (page === "items") {
     bootstrapItemsPage();
     return;
   }
   if (page === "news") {
     bootstrapNewsPage();
-    return;
   }
-  bootstrapHomePage();
 }
 
 bootstrap();

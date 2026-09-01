@@ -10,17 +10,20 @@
     >
     <link rel="stylesheet" href="assets/css/style.css">
   </head>
-  <body>
+  <body data-page="home">
     <div class="page-shell">
       <header class="site-header">
         <div class="site-header__inner">
           <a class="site-brand" href="./" aria-label="時継舎 ホーム">
             <span class="site-brand__mark" aria-hidden="true">時</span>
-            <span class="site-brand__name">時継舎</span>
+            <span class="site-brand__copy">
+              <span class="site-brand__ruby">とぎつぎしゃ</span>
+              <span class="site-brand__name">時継舎</span>
+            </span>
           </a>
           <nav class="site-nav" aria-label="主要メニュー">
             <ul class="site-nav__list">
-              <li><a class="is-current" href="./">ホーム</a></li>
+              <li><a class="is-current" href="./" aria-current="page">ホーム</a></li>
               <li><a href="./items/">品を見る</a></li>
               <li><a href="./about/">時継舎について</a></li>
               <li><a href="./owner/">店主のこと</a></li>
@@ -168,9 +171,11 @@
       <footer class="site-footer">
         <div class="site-footer__inner">
           <nav class="site-footer__nav" aria-label="補助メニュー">
+            <a href="./">ホーム</a>
+            <a href="./items/">品を見る</a>
             <a href="./about/">時継舎について</a>
-            <a href="./contact/">お問い合わせ</a>
             <a href="./news/">お知らせ</a>
+            <a href="./contact/">お問い合わせ</a>
           </nav>
           <p class="site-footer__copyright">© 2026 時継舎</p>
         </div>
