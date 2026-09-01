@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "togitsugisha",
+  "compatibility_date": "2026-05-03",
+  "assets": {
+    "directory": "./.cloudflare-static",
+    "not_found_handling": "404-page"
+  }
+}

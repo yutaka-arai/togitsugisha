@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "description": "時継舎（とぎつぎしゃ）の静的ホームページ",
   "scripts": {
-    "build": "echo 'Static site ready'"
+    "build": "bash ./scripts/prepare-cloudflare-static.sh"
+  },
+  "devDependencies": {
+    "wrangler": "^4.86.0"
   }
 }
