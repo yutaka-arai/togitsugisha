@@ -63,3 +63,26 @@ togitsugisha/
 3. `style.css` で配色、余白、タイポグラフィを定義
 4. ホームページを優先実装
 5. 下層ページへ展開
+
+## 公開手順
+
+1. ローカル確認
+   - 例: `python3 -m http.server 8000`
+   - ブラウザで `http://127.0.0.1:8000/` を開き、6ページの表示を確認する
+2. 変更をコミット
+   - `git status`
+   - `git add .`
+   - `git commit -m "公開前の更新内容"`
+3. GitHub へ反映
+   - GitHub でリポジトリを用意する
+   - `git remote add origin <GitHub リポジトリ URL>`
+   - `git push -u origin main`
+4. Cloudflare Pages に接続
+   - GitHub リポジトリを Cloudflare Pages に接続する
+   - フレームワークプリセットは使わず、静的サイトとして設定する
+   - ビルドコマンドは未設定、出力ディレクトリは `/` を基準に確認する
+5. 無料 URL を確認
+   - Cloudflare Pages の初回デプロイ完了後、発行された `*.pages.dev` URL で表示確認する
+6. 公開後の確認
+   - PC とスマートフォンでナビゲーション、文字サイズ、リンク切れ、JSON 読み込みを確認する
+
