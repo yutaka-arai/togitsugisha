@@ -4,9 +4,11 @@
   "version": "1.0.0",
   "description": "時継舎（とぎつぎしゃ）の静的ホームページ",
   "scripts": {
-    "build": "bash ./scripts/prepare-cloudflare-static.sh"
+    "build": "bash ./scripts/prepare-cloudflare-static.sh",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "wrangler": "^4.86.0"
   }
 }
