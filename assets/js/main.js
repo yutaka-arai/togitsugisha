@@ -292,12 +292,20 @@ function renderItemsPage(items) {
               const description = escapeHtml(item.description || "詳細は順次掲載いたします。");
               const price = item.price ? `<p class="items-entry__meta">価格: ${escapeHtml(item.price)}</p>` : "";
               const statusText = escapeHtml(item.status || "掲載中");
+              const thumb = item.thumb
+                ? `<div class="items-entry__thumb"><img src="${escapeHtml(item.thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="lazy" decoding="async"></div>`
+                : "";
+              const more = item.href
+                ? `<a class="items-entry__more" href="${escapeHtml(item.href)}">詳しく見る<span aria-hidden="true">→</span></a>`
+                : "";
               return `
                 <article class="items-entry">
+                  ${thumb}
                   <span class="items-entry__status">${statusText}</span>
                   <h4>${title}</h4>
                   ${price}
                   <p class="items-entry__description">${description}</p>
+                  ${more}
                 </article>
               `;
             }).join("")}
