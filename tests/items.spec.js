@@ -18,7 +18,7 @@ function collectBrowserErrors(page) {
   return errors;
 }
 
-const itemTitle = "浮世絵 三枚続　相撲上覧図（額装）";
+const itemTitle = "浮世絵 三枚続　相撲場面（額装）";
 
 test("items list shows the product card and links to its detail page", async ({ page }) => {
   const errors = collectBrowserErrors(page);

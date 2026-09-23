@@ -9,6 +9,7 @@ mkdir -p "$OUT_DIR"
 
 cp "$ROOT_DIR/index.html" "$OUT_DIR/index.html"
 cp "$ROOT_DIR/favicon.ico" "$OUT_DIR/favicon.ico"
+cp "$ROOT_DIR/sitemap.xml" "$OUT_DIR/sitemap.xml"
 cp -R "$ROOT_DIR/items" "$OUT_DIR/items"
 cp -R "$ROOT_DIR/about" "$OUT_DIR/about"
 cp -R "$ROOT_DIR/owner" "$OUT_DIR/owner"
