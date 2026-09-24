@@ -8,5 +8,25 @@
     "thumb": "../assets/images/items/ukiyoe-001-thumb.webp",
     "thumbAlt": "額装された浮世絵 三枚続の実物写真。御殿と庭園を背景に武士や相撲を取る人物が描かれている。",
     "href": "./ukiyoe-001/"
+  },
+  {
+    "id": "ukiyoe-002",
+    "category": "others",
+    "name": "歌川広重 六十余州名所図会 対馬 海岸夕晴",
+    "status": "詳細確認中",
+    "description": "歌川広重による「六十余州名所図会」シリーズの一図です。対馬の海岸に夕晴れの景を描いた作品としてご紹介します。真贋・摺りの時期・状態詳細は確認中です。",
+    "thumb": "../assets/images/items/ukiyoe-002-thumb.webp",
+    "thumbAlt": "歌川広重 六十余州名所図会 対馬 海岸夕晴の実物写真。",
+    "href": "./ukiyoe-002/"
+  },
+  {
+    "id": "ukiyoe-003",
+    "category": "others",
+    "name": "歌川広重 六十余州名所図会 安房 小湊内浦",
+    "status": "詳細確認中",
+    "description": "歌川広重による「六十余州名所図会」シリーズの一図です。安房国小湊の内浦を描いた作品としてご紹介します。真贋・摺りの時期・状態詳細は確認中です。",
+    "thumb": "../assets/images/items/ukiyoe-003-thumb.webp",
+    "thumbAlt": "歌川広重 六十余州名所図会 安房 小湊内浦の実物写真。",
+    "href": "./ukiyoe-003/"
   }
 ]
