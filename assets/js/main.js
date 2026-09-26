@@ -111,10 +111,12 @@ function renderNews(items) {
     .map((entry) => {
       const text = escapeHtml(entry.text || entry.title || "ただいまホームページを準備しています。");
       const displayDate = formatDisplayDate(entry.date);
+      const href = entry.href ? escapeHtml(entry.href) : "";
+      const body = href ? `<a href="news/${href.replace(/^\.\//, "")}">${text}</a>` : text;
       return `
         <li class="news-list__item${entry.date ? "" : " news-list__item--waiting"}">
           ${entry.date ? `<time datetime="${escapeHtml(entry.date)}">${displayDate}</time>` : ""}
-          <p>${text}</p>
+          <p>${body}</p>
         </li>
       `;
     })
@@ -165,6 +167,9 @@ function renderNewsPage(items) {
       const category = entry.category ? `<span class="news-entry__category">${escapeHtml(entry.category)}</span>` : "";
       const title = escapeHtml(entry.title || "お知らせ");
       const body = escapeHtml(entry.body || entry.text || "詳細は順次ご案内いたします。");
+      const href = entry.href ? escapeHtml(entry.href) : "";
+      const heading = href ? `<a href="${href}">${title}</a>` : title;
+      const more = href ? `<a class="news-entry__more" href="${href}">記事を読む<span aria-hidden="true">→</span></a>` : "";
       return `
         <article class="news-entry">
           <div class="news-entry__meta">
@@ -172,8 +177,9 @@ function renderNewsPage(items) {
             ${category}
           </div>
           <div class="news-entry__body">
-            <h3>${title}</h3>
+            <h3>${heading}</h3>
             <p>${body}</p>
+            ${more}
           </div>
         </article>
       `;
