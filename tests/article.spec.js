@@ -12,6 +12,12 @@ const awaArticleTitle = "歌川広重《六十余州名所図会 安房 小湊�
 const awaArticleDescription = "歌川広重「六十余州名所図会」の一図《安房 小湊内浦》を紹介。現在の千葉県鴨川市にあたる内浦海岸の景観を通して、作品とシリーズの背景をたどります。";
 const awaH1Text = "歌川広重《六十余州名所図会 安房 小湊内浦》を読む ――海を望む安房・小湊の風景";
 
+const hubArticlePath = "/news/hiroshige-rokuju-yoshu-meisho-zue/";
+const hubArticleUrl = "https://togitsugisha.com/news/hiroshige-rokuju-yoshu-meisho-zue/";
+const hubArticleTitle = "歌川広重「六十余州名所図会」とは？｜日本各地を描いた名所絵｜時継舎";
+const hubArticleDescription = "歌川広重の「六十余州名所図会」とはどのようなシリーズなのか。1853年から1856年に制作された全70図の構成をたどりながら、時継舎掲載の《対馬 海岸夕晴》《安房 小湊内浦》を紹介します。";
+const hubH1Text = "歌川広重「六十余州名所図会」とは？ ――日本各地を描いた名所絵のシリーズ";
+
 const severeConsoleTypes = new Set(["error"]);
 
 function collectBrowserErrors(page) {
@@ -71,6 +77,7 @@ test("Hiroshige Tsushima article exposes SEO metadata and internal links", async
 
   await expect(page.getByRole("link", { name: "時継舎掲載作品『六十余州名所図会 対馬 海岸夕晴』を見る" }).first()).toHaveAttribute("href", "../../items/ukiyoe-002/");
   await expect(page.getByRole("link", { name: "時継舎掲載作品『六十余州名所図会 安房 小湊内浦』を見る" }).first()).toHaveAttribute("href", "../../items/ukiyoe-003/");
+  await expect(page.getByRole("link", { name: "「六十余州名所図会」のシリーズ解説を読む" }).first()).toHaveAttribute("href", "../hiroshige-rokuju-yoshu-meisho-zue/");
   await expect(page.getByRole("link", { name: "国立国会図書館「六十余州名所図会」" })).toHaveAttribute("href", "https://www.ndl.go.jp/landmarks/series/60meisho");
   await expect(page.getByRole("link", { name: "国立国会図書館「対馬」" })).toHaveAttribute("href", "https://www.ndl.go.jp/landmarks/sights/tsushima");
   await expect(page.getByRole("link", { name: "国立国会図書館サーチ「大日本六十餘州名勝圖會」" })).toHaveAttribute("href", "https://ndlsearch.ndl.go.jp/books/R100000002-I000007301389");
@@ -98,6 +105,7 @@ test("Hiroshige Awa article exposes SEO metadata and internal links", async ({ p
 
   await expect(page.getByRole("link", { name: "時継舎掲載作品「六十余州名所図会 安房 小湊内浦」を見る" }).first()).toHaveAttribute("href", "../../items/ukiyoe-003/");
   await expect(page.getByRole("link", { name: "《対馬 海岸夕晴》の解説記事を読む" }).first()).toHaveAttribute("href", "../hiroshige-tsushima-kaigan-yubare/");
+  await expect(page.getByRole("link", { name: "「六十余州名所図会」のシリーズ解説を読む" }).first()).toHaveAttribute("href", "../hiroshige-rokuju-yoshu-meisho-zue/");
   await expect(page.getByRole("link", { name: "文化遺産オンライン「版画『六十余州名所図会 安房 小湊内浦』」" })).toHaveAttribute("href", "https://online.bunka.go.jp/index.php/heritages/detail/359724");
   await expect(page.getByRole("link", { name: "アートプラットフォームジャパン「六十余州名所図会 安房 小湊内浦」" })).toHaveAttribute("href", "https://artplatform.go.jp/ja/collections/W282439");
   await expect(page.getByRole("link", { name: "静岡市東海道広重美術館 出品目録" })).toHaveAttribute("href", "https://tokaido-hiroshige.jp/assets/docs/exhibition/2023_1st_exhibition_list_jp.pdf");
@@ -107,13 +115,46 @@ test("Hiroshige Awa article exposes SEO metadata and internal links", async ({ p
   expect(errors).toEqual([]);
 });
 
+test("Hiroshige Rokuju Yoshu hub exposes SEO metadata and series links", async ({ page, request }) => {
+  const errors = collectBrowserErrors(page);
+
+  const response = await page.goto(hubArticlePath);
+  expect(response.status()).toBe(200);
+
+  await expect(page).toHaveTitle(hubArticleTitle);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", hubArticleDescription);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", hubArticleUrl);
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", "article");
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", hubArticleTitle);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", hubArticleDescription);
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", hubArticleUrl);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", "https://togitsugisha.com/assets/images/items/ukiyoe-002-main.webp");
+  await expect(page.getByRole("heading", { name: hubH1Text })).toBeVisible();
+  await expect(page.getByText("江戸時代を代表する浮世絵師、歌川広重。")).toBeVisible();
+  await expect(page.getByText("目録を含めたシリーズ全体を70図とする説明と区別して読むことができます。")).toBeVisible();
+
+  await expect(page.getByRole("link", { name: "《対馬 海岸夕晴》の解説を読む" }).first()).toHaveAttribute("href", "../hiroshige-tsushima-kaigan-yubare/");
+  await expect(page.getByRole("link", { name: "《安房 小湊内浦》の解説を読む" }).first()).toHaveAttribute("href", "../hiroshige-awa-kominato-uchiura/");
+  await expect(page.getByRole("link", { name: "時継舎掲載の《対馬 海岸夕晴》を見る" }).first()).toHaveAttribute("href", "../../items/ukiyoe-002/");
+  await expect(page.getByRole("link", { name: "時継舎掲載の《安房 小湊内浦》を見る" }).first()).toHaveAttribute("href", "../../items/ukiyoe-003/");
+  await expect(page.getByRole("link", { name: "国立国会図書館「六十余州名所図会」" })).toHaveAttribute("href", "https://www.ndl.go.jp/landmarks/series/60meisho");
+  await expect(page.getByRole("link", { name: "国立国会図書館 NDLイメージバンク「六十余州名所図会」" })).toHaveAttribute("href", "https://www.ndl.go.jp/imagebank/theme/60meisho");
+  await expect(page.getByRole("link", { name: "国立国会図書館サーチ「大日本六十餘州名勝圖會」" })).toHaveAttribute("href", "https://ndlsearch.ndl.go.jp/books/R100000002-I000007301389");
+  await expect(page.getByRole("link", { name: "サントリー美術館「原安三郎コレクション 広重ビビッド」" })).toHaveAttribute("href", "https://www.suntory.co.jp/sma/exhibition/2016_2/display.html");
+
+  await expectLocalLinksAndImagesOk(page, request);
+  expect(errors).toEqual([]);
+});
+
 test("news list and sitemap include the article once", async ({ page, request }) => {
   const errors = collectBrowserErrors(page);
 
   await page.goto("/news/");
+  await expect(page.getByRole("link", { name: "歌川広重「六十余州名所図会」とは？" })).toHaveCount(1);
   await expect(page.getByRole("link", { name: "歌川広重《六十余州名所図会 対馬 海岸夕晴》を読む" })).toHaveCount(1);
   await expect(page.getByRole("link", { name: "歌川広重《六十余州名所図会 安房 小湊内浦》を読む" })).toHaveCount(1);
-  await expect(page.getByRole("link", { name: /記事を読む/ })).toHaveCount(2);
+  await expect(page.getByRole("link", { name: /記事を読む/ })).toHaveCount(3);
+  await expect(page.locator('.news-entry', { hasText: "歌川広重「六十余州名所図会」とは？" }).getByRole("link", { name: /記事を読む/ })).toHaveAttribute("href", "./hiroshige-rokuju-yoshu-meisho-zue/");
   await expect(page.locator('.news-entry', { hasText: "歌川広重《六十余州名所図会 対馬 海岸夕晴》を読む" }).getByRole("link", { name: /記事を読む/ })).toHaveAttribute("href", "./hiroshige-tsushima-kaigan-yubare/");
   await expect(page.locator('.news-entry', { hasText: "歌川広重《六十余州名所図会 安房 小湊内浦》を読む" }).getByRole("link", { name: /記事を読む/ })).toHaveAttribute("href", "./hiroshige-awa-kominato-uchiura/");
   expect(errors).toEqual([]);
@@ -121,8 +162,18 @@ test("news list and sitemap include the article once", async ({ page, request })
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const sitemapText = await sitemap.text();
+  expect(sitemapText.match(new RegExp(hubArticleUrl, "g"))).toHaveLength(1);
   expect(sitemapText.match(new RegExp(articleUrl, "g"))).toHaveLength(1);
   expect(sitemapText.match(new RegExp(awaArticleUrl, "g"))).toHaveLength(1);
+  for (const url of [
+    "https://togitsugisha.com/",
+    "https://togitsugisha.com/items/",
+    "https://togitsugisha.com/items/ukiyoe-001/",
+    "https://togitsugisha.com/items/ukiyoe-002/",
+    "https://togitsugisha.com/items/ukiyoe-003/"
+  ]) {
+    expect(sitemapText).toContain(url);
+  }
 });
 
 test("article page holds up on desktop and 390px mobile", async ({ page }) => {
@@ -169,9 +220,38 @@ test("Awa article page holds up on desktop and 390px mobile without horizontal o
   expect(errors).toEqual([]);
 });
 
+test("Rokuju Yoshu hub page holds up on desktop and 390px mobile without horizontal overflow", async ({ page }) => {
+  const errors = collectBrowserErrors(page);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(hubArticlePath);
+  await expect(page.getByRole("heading", { name: hubH1Text })).toBeVisible();
+  await expect(page.locator(".article-page__figure img")).toBeVisible();
+  await page.screenshot({ path: "test-results/article-hiroshige-rokuju-yoshu-hub-desktop.png", fullPage: true });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(hubArticlePath);
+  await expect(page.getByRole("heading", { name: hubH1Text })).toBeVisible();
+  const box = await page.locator(".article-page__figure img").boundingBox();
+  expect(box).not.toBeNull();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(391);
+  const horizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+  expect(horizontalOverflow).toBe(false);
+  await page.screenshot({ path: "test-results/article-hiroshige-rokuju-yoshu-hub-mobile.png", fullPage: true });
+
+  expect(errors).toEqual([]);
+});
+
 test("existing item pages remain reachable", async ({ request }) => {
-  for (const path of ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/", articlePath, awaArticlePath]) {
+  for (const path of ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/", articlePath, awaArticlePath, hubArticlePath]) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(200);
   }
+
+  const item002 = await request.get("/items/ukiyoe-002/");
+  expect(await item002.text()).toContain("../../news/hiroshige-rokuju-yoshu-meisho-zue/");
+
+  const item003 = await request.get("/items/ukiyoe-003/");
+  expect(await item003.text()).toContain("../../news/hiroshige-rokuju-yoshu-meisho-zue/");
 });
