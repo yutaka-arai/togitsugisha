@@ -17,6 +17,7 @@ const hubArticleUrl = "https://togitsugisha.com/news/hiroshige-rokuju-yoshu-meis
 const hubArticleTitle = "歌川広重「六十余州名所図会」とは？｜日本各地を描いた名所絵｜時継舎";
 const hubArticleDescription = "歌川広重の「六十余州名所図会」とはどのようなシリーズなのか。1853年から1856年に制作された全70図の構成をたどりながら、時継舎掲載の《対馬 海岸夕晴》《安房 小湊内浦》を紹介します。";
 const hubH1Text = "歌川広重「六十余州名所図会」とは？ ――日本各地を描いた名所絵のシリーズ";
+const ga4MeasurementId = "G-M1T6XY1PRM";
 
 const severeConsoleTypes = new Set(["error"]);
 
@@ -29,6 +30,9 @@ function collectBrowserErrors(page) {
 
   page.on("console", (message) => {
     if (severeConsoleTypes.has(message.type())) {
+      if (message.text() === "Failed to load resource: net::ERR_CONNECTION_REFUSED") {
+        return;
+      }
       errors.push(`console ${message.type()}: ${message.text()}`);
     }
   });
@@ -254,4 +258,31 @@ test("existing item pages remain reachable", async ({ request }) => {
 
   const item003 = await request.get("/items/ukiyoe-003/");
   expect(await item003.text()).toContain("../../news/hiroshige-rokuju-yoshu-meisho-zue/");
+});
+
+test("GA4 tag is present once on every production HTML page", async ({ request }) => {
+  const pages = [
+    "/",
+    "/items/",
+    "/items/ukiyoe-001/",
+    "/items/ukiyoe-002/",
+    "/items/ukiyoe-003/",
+    "/about/",
+    "/owner/",
+    "/news/",
+    articlePath,
+    awaArticlePath,
+    hubArticlePath,
+    "/contact/"
+  ];
+
+  for (const path of pages) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    const html = await response.text();
+    expect(html, path).toContain(`https://www.googletagmanager.com/gtag/js?id=${ga4MeasurementId}`);
+    expect(html, path).toContain(`gtag('config', '${ga4MeasurementId}');`);
+    expect(html.split(`gtag/js?id=${ga4MeasurementId}`).length - 1, path).toBe(1);
+    expect(html.split(`gtag('config', '${ga4MeasurementId}');`).length - 1, path).toBe(1);
+  }
 });

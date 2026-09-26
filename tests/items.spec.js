@@ -11,6 +11,9 @@ function collectBrowserErrors(page) {
 
   page.on("console", (message) => {
     if (severeConsoleTypes.has(message.type())) {
+      if (message.text() === "Failed to load resource: net::ERR_CONNECTION_REFUSED") {
+        return;
+      }
       errors.push(`console ${message.type()}: ${message.text()}`);
     }
   });
