@@ -70,11 +70,19 @@ function renderHomeItems(items) {
     .map((item) => {
       const title = escapeHtml(item.name || "掲載予定の品");
       const description = escapeHtml(item.description || "詳細は順次公開予定です。");
+      const href = item.href ? `items/${String(item.href).replace(/^\.\//, "")}` : "./items/";
+      const thumb = item.thumb ? String(item.thumb).replace(/^\.\.\//, "") : "";
+      const image = thumb
+        ? `<a class="items-entry__thumb" href="${escapeHtml(href)}"><img src="${escapeHtml(thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="lazy" decoding="async"></a>`
+        : "";
+      const more = `<a class="items-entry__more" href="${escapeHtml(href)}">詳しく見る<span aria-hidden="true">→</span></a>`;
       return `
-        <article class="placeholder-card">
-          <span class="placeholder-card__icon" aria-hidden="true">品</span>
-          <h3>${title}</h3>
-          <p>${description}</p>
+        <article class="items-entry">
+          ${image}
+          <span class="items-entry__status">${escapeHtml(item.status || "掲載中")}</span>
+          <h3><a href="${escapeHtml(href)}">${title}</a></h3>
+          <p class="items-entry__description">${description}</p>
+          ${more}
         </article>
       `;
     })
@@ -293,7 +301,7 @@ function renderItemsPage(items) {
               const price = item.price ? `<p class="items-entry__meta">価格: ${escapeHtml(item.price)}</p>` : "";
               const statusText = escapeHtml(item.status || "掲載中");
               const thumb = item.thumb
-                ? `<div class="items-entry__thumb"><img src="${escapeHtml(item.thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="lazy" decoding="async"></div>`
+                ? `<a class="items-entry__thumb" href="${escapeHtml(item.href || "#")}"><img src="${escapeHtml(item.thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="lazy" decoding="async"></a>`
                 : "";
               const more = item.href
                 ? `<a class="items-entry__more" href="${escapeHtml(item.href)}">詳しく見る<span aria-hidden="true">→</span></a>`
@@ -302,7 +310,7 @@ function renderItemsPage(items) {
                 <article class="items-entry">
                   ${thumb}
                   <span class="items-entry__status">${statusText}</span>
-                  <h4>${title}</h4>
+                  <h4>${item.href ? `<a href="${escapeHtml(item.href)}">${title}</a>` : title}</h4>
                   ${price}
                   <p class="items-entry__description">${description}</p>
                   ${more}

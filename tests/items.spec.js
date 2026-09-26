@@ -36,6 +36,64 @@ const newItems = [
   },
 ];
 
+
+const listedItemPaths = ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/"];
+
+
+const detailMetadataItems = [
+  {
+    title: itemTitle,
+    path: "/items/ukiyoe-001/",
+    canonical: "https://togitsugisha.com/items/ukiyoe-001/",
+    ogImage: "https://togitsugisha.com/assets/images/items/ukiyoe-001-main.webp",
+  },
+  ...newItems,
+];
+
+test("item detail pages retain canonical and OGP metadata", async ({ page }) => {
+  for (const item of detailMetadataItems) {
+    await page.goto(item.path);
+    await expect(page.getByRole("heading", { name: item.title })).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", item.canonical);
+    await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", item.canonical);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", `${item.title} | 時継舎`);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", item.ogImage);
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
+  }
+});
+
+test("initial HTML exposes item links before JavaScript renders", async ({ request }) => {
+  const [homeResponse, itemsResponse] = await Promise.all([
+    request.get("/"),
+    request.get("/items/"),
+  ]);
+
+  expect(homeResponse.status()).toBe(200);
+  expect(itemsResponse.status()).toBe(200);
+
+  const homeHtml = await homeResponse.text();
+  const itemsHtml = await itemsResponse.text();
+
+  for (const path of listedItemPaths) {
+    expect(homeHtml).toContain(`href=".${path}"`);
+    expect(itemsHtml).toContain(`href=".${path.replace("/items", "")}"`);
+  }
+});
+
+test("items list does not duplicate product cards after JavaScript renders", async ({ page }) => {
+  const errors = collectBrowserErrors(page);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/items/");
+
+  await expect(page.locator(".items-entry")).toHaveCount(3);
+  for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
+    await expect(page.locator(".items-entry", { hasText: item })).toHaveCount(1);
+  }
+
+  expect(errors).toEqual([]);
+});
+
 test("items list shows the product card and links to its detail page", async ({ page }) => {
   const errors = collectBrowserErrors(page);
 
@@ -101,6 +159,12 @@ test("new ukiyoe items appear in list and expose detail metadata", async ({ page
     await expect(page.getByRole("heading", { name: item.title })).toBeVisible();
     await expect(page.getByText("真作・初摺・江戸期オリジナル・後摺・復刻版等の別については、現在断定していません。")).toBeVisible();
     await expect(page.getByRole("link", { name: /お問い合わせへ/ })).toBeVisible();
+    if (item.path.endsWith("ukiyoe-002/")) {
+      await expect(page.getByRole("link", { name: "歌川広重 六十余州名所図会 安房 小湊内浦" })).toHaveAttribute("href", "../ukiyoe-003/");
+    }
+    if (item.path.endsWith("ukiyoe-003/")) {
+      await expect(page.getByRole("link", { name: "歌川広重 六十余州名所図会 対馬 海岸夕晴" })).toHaveAttribute("href", "../ukiyoe-002/");
+    }
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", item.canonical);
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute("content", item.canonical);
     await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", `${item.title} | 時継舎`);
