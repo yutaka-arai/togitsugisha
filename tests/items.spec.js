@@ -42,6 +42,8 @@ const newItems = [
 
 const listedItemPaths = ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/"];
 const unpublishedTerms = ["時計", "腕時計", "置時計", "掛時計", "陶磁器", "家具", "その他古物", "古布", "Coming Soon", "仮価格", "仮在庫", "dummy"];
+const homeDescription = "時継舎では、現在ご紹介している浮世絵や古物を、背景や来歴とともに丁寧にご紹介します。";
+const aboutDescription = "時継舎は、現在ご紹介している古物や作品の背景を大切にし、一点ごとの物語を丁寧にお伝えしています。";
 
 
 const detailMetadataItems = [
@@ -53,6 +55,13 @@ const detailMetadataItems = [
   },
   ...newItems,
 ];
+
+async function itemEntryCountAfterFrames(page, selector) {
+  return page.evaluate(async (entrySelector) => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return document.querySelectorAll(entrySelector).length;
+  }, selector);
+}
 
 test("main pages expose a single Open Graph image", async ({ page }) => {
   const mainPages = [
@@ -72,6 +81,25 @@ test("main pages expose a single Open Graph image", async ({ page }) => {
     await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", "https://togitsugisha.com/assets/images/items/ukiyoe-002-main.webp");
     await expect(page.locator('script[src="https://www.googletagmanager.com/gtag/js?id=G-M1T6XY1PRM"]')).toHaveCount(1);
+    if (pageInfo.path === "/") {
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", homeDescription);
+      await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", homeDescription);
+    }
+  }
+});
+
+test("about page copy and metadata match current listings", async ({ page }) => {
+  await page.goto("/about/");
+
+  await expect(page.getByRole("heading", { name: "時継舎について" })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://togitsugisha.com/about/");
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", aboutDescription);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", aboutDescription);
+  await expect(page.locator('script[src="https://www.googletagmanager.com/gtag/js?id=G-M1T6XY1PRM"]')).toHaveCount(1);
+  await expect(page.getByText("現在ご紹介している古物や作品を中心に")).toBeVisible();
+  await expect(page.getByText("現在掲載している品の一覧")).toBeVisible();
+  for (const term of unpublishedTerms) {
+    await expect(page.locator("body")).not.toContainText(term);
   }
 });
 
@@ -110,6 +138,29 @@ test("initial HTML exposes item links before JavaScript renders", async ({ reque
   }
 });
 
+test("home item and news sections render after successful JavaScript data loads", async ({ page }) => {
+  const errors = collectBrowserErrors(page);
+  const itemsResponse = page.waitForResponse((response) =>
+    response.url().endsWith("/data/items.json") && response.ok()
+  );
+  const newsResponse = page.waitForResponse((response) =>
+    response.url().endsWith("/data/news.json") && response.ok()
+  );
+
+  await page.goto("/");
+  await Promise.all([itemsResponse, newsResponse]);
+
+  await expect(page.locator("#item-grid")).toHaveAttribute("data-items-render-state", "loaded");
+  await expect(page.locator("#news-list")).toHaveAttribute("data-news-render-state", "loaded");
+  await expect(page.locator(".items-panel .items-entry")).toHaveCount(3);
+  await expect(page.locator(".news-list__item")).toHaveCount(3);
+  await expect(page.getByText("歌川広重が日本各地の名所を描いた")).toBeVisible();
+  for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
+    await expect(page.locator(".items-panel .items-entry", { hasText: item })).toHaveCount(1);
+  }
+  expect(errors).toEqual([]);
+});
+
 test("items list does not duplicate product cards after JavaScript renders", async ({ page }) => {
   const errors = collectBrowserErrors(page);
 
@@ -120,7 +171,9 @@ test("items list does not duplicate product cards after JavaScript renders", asy
   await page.goto("/items/");
   await itemsResponse;
 
+  await expect(page.locator("#items-status")).toHaveAttribute("data-items-render-state", "loaded");
   await expect(page.locator(".items-entry")).toHaveCount(3);
+  await expect.poll(() => itemEntryCountAfterFrames(page, ".items-entry")).toBe(3);
   await expect(page.locator(".category-card")).toHaveCount(0);
   await expect(page.locator(".items-group")).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "時継舎で現在ご紹介している品々" })).toBeVisible();
@@ -162,11 +215,33 @@ test("home keeps static product cards when the items JSON fetch fails", async ({
   await page.goto("/");
   await failedItemsRequest;
 
+  await expect(page.locator("#item-grid")).toHaveAttribute("data-items-render-state", "fallback");
   await expect(page.locator(".items-panel .items-entry")).toHaveCount(3);
+  await expect.poll(() => itemEntryCountAfterFrames(page, ".items-panel .items-entry")).toBe(3);
   await expect(page.getByRole("heading", { name: "新着の品" })).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
     await expect(page.locator(".items-panel .items-entry", { hasText: item })).toHaveCount(1);
   }
+});
+
+test("home keeps products and falls back only news when the news JSON fetch fails", async ({ page }) => {
+  await page.route("**/data/news.json", (route) => route.abort("failed"));
+  const itemsResponse = page.waitForResponse((response) =>
+    response.url().endsWith("/data/items.json") && response.ok()
+  );
+  const failedNewsRequest = page.waitForEvent("requestfailed", (request) =>
+    request.url().endsWith("/data/news.json")
+  );
+
+  await page.goto("/");
+  await Promise.all([itemsResponse, failedNewsRequest]);
+
+  await expect(page.locator("#item-grid")).toHaveAttribute("data-items-render-state", "loaded");
+  await expect(page.locator("#news-list")).toHaveAttribute("data-news-render-state", "fallback");
+  await expect(page.locator(".items-panel .items-entry")).toHaveCount(3);
+  await expect(page.locator(".news-list__item")).toHaveCount(1);
+  await expect(page.locator(".news-list__item--waiting")).toHaveCount(1);
+  await expect(page.getByText("ただいまホームページを準備しています。")).toBeVisible();
 });
 
 test("items list shows the product card and links to its detail page", async ({ page }) => {

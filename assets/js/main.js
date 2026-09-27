@@ -17,6 +17,7 @@ function renderHomeWaitingItems() {
   const container = document.getElementById("item-grid");
   if (!container) return;
 
+  container.dataset.itemsRenderState = "waiting";
   container.innerHTML = `
     <div class="items-placeholder__copy">
       <p class="items-placeholder__status">準備中</p>
@@ -35,6 +36,7 @@ function renderHomeItems(items) {
   const container = document.getElementById("item-grid");
   if (!container) return;
 
+  container.dataset.itemsRenderState = "loaded";
   container.innerHTML = items
     .slice(0, 4)
     .map((item) => {
@@ -71,10 +73,11 @@ function formatDisplayDate(value) {
   return `${year}.${month}.${day}`;
 }
 
-function renderNews(items) {
+function renderNews(items, renderState = "loaded") {
   const container = document.getElementById("news-list");
   if (!container) return;
 
+  container.dataset.newsRenderState = renderState;
   const source = Array.isArray(items) && items.length > 0 ? items : waitingNews;
   container.innerHTML = source
     .slice(0, 3)
@@ -204,6 +207,7 @@ function renderItemsPage(items) {
       <p class="items-status__lead">実物写真と詳細ページがある品のみを一覧にしています。</p>
     </div>
   `;
+  status.dataset.itemsRenderState = "loaded";
 
   catalog.innerHTML = `
     <section class="items-group" id="listed-items" aria-labelledby="listed-items-title">
@@ -252,6 +256,10 @@ async function bootstrapHomePage() {
     })
     .catch((error) => {
       // Keep the server-rendered static item cards visible on fetch failure.
+      const container = document.getElementById("item-grid");
+      if (container) {
+        container.dataset.itemsRenderState = "fallback";
+      }
       console.warn("Item data could not be loaded. Keeping the static home item list as-is.", error);
     });
 
@@ -261,7 +269,7 @@ async function bootstrapHomePage() {
     })
     .catch((error) => {
       console.warn("News data could not be loaded. Waiting-state content is used.", error);
-      renderNews(waitingNews);
+      renderNews(waitingNews, "fallback");
     });
 
   await Promise.all([itemsPromise, newsPromise]);
