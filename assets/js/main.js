@@ -4,14 +4,6 @@ const waitingNews = [
   }
 ];
 
-const itemCategories = [
-  { id: "clock", label: "古時計", icon: "時" },
-  { id: "ceramics", label: "器・陶磁器", icon: "器" },
-  { id: "tools", label: "古道具", icon: "道" },
-  { id: "textiles", label: "古布・染織", icon: "布" },
-  { id: "others", label: "その他", icon: "余" }
-];
-
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -28,30 +20,8 @@ function renderHomeWaitingItems() {
   container.innerHTML = `
     <div class="items-placeholder__copy">
       <p class="items-placeholder__status">準備中</p>
-      <p class="items-placeholder__lead">近日公開予定です。</p>
-      <p class="items-placeholder__text">商品の写真と詳細は、順次公開いたします。</p>
-    </div>
-    <div class="placeholder-grid" aria-label="古物の装飾イメージ">
-      <article class="placeholder-card">
-        <span class="placeholder-card__icon" aria-hidden="true">時</span>
-        <h3>古時計</h3>
-        <p>装飾イメージ</p>
-      </article>
-      <article class="placeholder-card">
-        <span class="placeholder-card__icon" aria-hidden="true">湯</span>
-        <h3>鉄瓶</h3>
-        <p>装飾イメージ</p>
-      </article>
-      <article class="placeholder-card">
-        <span class="placeholder-card__icon" aria-hidden="true">器</span>
-        <h3>陶磁器</h3>
-        <p>装飾イメージ</p>
-      </article>
-      <article class="placeholder-card">
-        <span class="placeholder-card__icon" aria-hidden="true">布</span>
-        <h3>古布</h3>
-        <p>装飾イメージ</p>
-      </article>
+      <p class="items-placeholder__lead">掲載内容を確認しています。</p>
+      <p class="items-placeholder__text">掲載済みの写真と詳細が整った品のみ、順次ご案内します。</p>
     </div>
   `;
 }
@@ -187,16 +157,6 @@ function renderNewsPage(items) {
     .join("");
 }
 
-function normalizeCategory(value) {
-  const text = String(value || "").trim().toLowerCase();
-  if (["clock", "古時計"].includes(text)) return "clock";
-  if (["ceramics", "器", "陶磁器", "器・陶磁器"].includes(text)) return "ceramics";
-  if (["tools", "古道具", "道具"].includes(text)) return "tools";
-  if (["textiles", "古布", "染織", "古布・染織"].includes(text)) return "textiles";
-  if (["others", "other", "その他"].includes(text)) return "others";
-  return "others";
-}
-
 function renderItemsPageWaiting(message) {
   const status = document.getElementById("items-status");
   const catalog = document.getElementById("items-catalog");
@@ -210,35 +170,18 @@ function renderItemsPageWaiting(message) {
     </div>
   `;
 
-  catalog.innerHTML = itemCategories
-    .map((category) => `
-      <section class="items-group" id="${category.id}" aria-labelledby="${category.id}-title">
-        <div class="items-group__heading">
-          <h3 id="${category.id}-title">${category.label}</h3>
-          <p>掲載準備中</p>
-        </div>
-        <div class="items-group__empty">
-          <div class="items-group__copy">
-            <p class="is-strong">品物はただいま準備中です</p>
-            <p>写真と詳細は順次掲載いたします。</p>
-            <p>この欄では、${category.label}に関する内容を今後ご案内します。</p>
-          </div>
-          <div class="items-group__decor" aria-label="${category.label}の装飾イメージ">
-            <article class="items-group__ornament">
-              <span aria-hidden="true">${category.icon}</span>
-              <h4>${category.label}</h4>
-              <p>装飾イメージ</p>
-            </article>
-            <article class="items-group__ornament">
-              <span aria-hidden="true">継</span>
-              <h4>掲載準備中</h4>
-              <p>詳細は順次ご案内いたします。</p>
-            </article>
-          </div>
-        </div>
-      </section>
-    `)
-    .join("");
+  catalog.innerHTML = `
+    <section class="items-group" id="listed-items" aria-labelledby="listed-items-title">
+      <div class="items-group__heading">
+        <h3 id="listed-items-title">掲載中の品</h3>
+        <p>確認中</p>
+      </div>
+      <div class="items-group__copy">
+        <p class="is-strong">掲載済みの品を確認しています</p>
+        <p>実際の写真と詳細が確認できた内容のみ表示します。</p>
+      </div>
+    </section>
+  `;
 }
 
 function renderItemsPage(items) {
@@ -257,77 +200,41 @@ function renderItemsPage(items) {
 
   status.innerHTML = `
     <div class="items-status__copy">
-      <p class="items-status__title">現在ご案内中の品物</p>
-      <p class="items-status__lead">分野ごとに一覧でご覧いただけます。</p>
+      <p class="items-status__title">時継舎で現在ご紹介している品々</p>
+      <p class="items-status__lead">掲載済みの写真と詳細がある品のみを一覧にしています。</p>
     </div>
   `;
 
-  const grouped = new Map(itemCategories.map((category) => [category.id, []]));
-  for (const item of items) {
-    grouped.get(normalizeCategory(item.category)).push(item);
-  }
-
-  catalog.innerHTML = itemCategories
-    .map((category) => {
-      const entries = grouped.get(category.id) || [];
-      if (entries.length === 0) {
-        return `
-          <section class="items-group" id="${category.id}" aria-labelledby="${category.id}-title">
-            <div class="items-group__heading">
-              <h3 id="${category.id}-title">${category.label}</h3>
-              <p>掲載準備中</p>
-            </div>
-            <div class="items-group__empty">
-              <div class="items-group__copy">
-                <p class="is-strong">この分野の掲載は準備中です</p>
-                <p>写真と詳細は順次掲載いたします。</p>
-              </div>
-              <div class="items-group__decor" aria-label="${category.label}の装飾イメージ">
-                <article class="items-group__ornament">
-                  <span aria-hidden="true">${category.icon}</span>
-                  <h4>${category.label}</h4>
-                  <p>装飾イメージ</p>
-                </article>
-              </div>
-            </div>
-          </section>
-        `;
-      }
-
-      return `
-        <section class="items-group" id="${category.id}" aria-labelledby="${category.id}-title">
-          <div class="items-group__heading">
-            <h3 id="${category.id}-title">${category.label}</h3>
-            <p>${entries.length}件</p>
-          </div>
-          <div class="items-card-grid">
-            ${entries.map((item) => {
-              const title = escapeHtml(item.name || "名称準備中");
-              const description = escapeHtml(item.description || "詳細は順次掲載いたします。");
-              const price = item.price ? `<p class="items-entry__meta">価格: ${escapeHtml(item.price)}</p>` : "";
-              const statusText = escapeHtml(item.status || "掲載中");
-              const thumb = item.thumb
-                ? `<a class="items-entry__thumb" href="${escapeHtml(item.href || "#")}"><img src="${escapeHtml(item.thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="lazy" decoding="async"></a>`
-                : "";
-              const more = item.href
-                ? `<a class="items-entry__more" href="${escapeHtml(item.href)}">詳しく見る<span aria-hidden="true">→</span></a>`
-                : "";
-              return `
-                <article class="items-entry">
-                  ${thumb}
-                  <span class="items-entry__status">${statusText}</span>
-                  <h4>${item.href ? `<a href="${escapeHtml(item.href)}">${title}</a>` : title}</h4>
-                  ${price}
-                  <p class="items-entry__description">${description}</p>
-                  ${more}
-                </article>
-              `;
-            }).join("")}
-          </div>
-        </section>
-      `;
-    })
-    .join("");
+  catalog.innerHTML = `
+    <section class="items-group" id="listed-items" aria-labelledby="listed-items-title">
+      <div class="items-group__heading">
+        <h3 id="listed-items-title">掲載中の品</h3>
+        <p>${items.length}件</p>
+      </div>
+      <div class="items-card-grid">
+        ${items.map((item) => {
+          const title = escapeHtml(item.name || "名称確認中");
+          const description = escapeHtml(item.description || "確認できた内容を掲載しています。");
+          const statusText = escapeHtml(item.status || "掲載中");
+          const thumb = item.thumb
+            ? `<a class="items-entry__thumb" href="${escapeHtml(item.href || "#")}"><img src="${escapeHtml(item.thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="eager" decoding="async"></a>`
+            : "";
+          const more = item.href
+            ? `<a class="items-entry__more" href="${escapeHtml(item.href)}">詳しく見る<span aria-hidden="true">→</span></a>`
+            : "";
+          return `
+            <article class="items-entry">
+              ${thumb}
+              <span class="items-entry__status">${statusText}</span>
+              <h4>${item.href ? `<a href="${escapeHtml(item.href)}">${title}</a>` : title}</h4>
+              <p class="items-entry__description">${description}</p>
+              ${more}
+            </article>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
 }
 
 async function readJson(path) {

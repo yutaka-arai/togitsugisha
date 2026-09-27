@@ -41,6 +41,7 @@ const newItems = [
 
 
 const listedItemPaths = ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/"];
+const unpublishedTerms = ["時計", "腕時計", "置時計", "掛時計", "陶磁器", "家具", "その他古物", "Coming Soon", "仮価格", "仮在庫"];
 
 
 const detailMetadataItems = [
@@ -102,6 +103,11 @@ test("initial HTML exposes item links before JavaScript renders", async ({ reque
     expect(homeHtml).toContain(`href=".${path}"`);
     expect(itemsHtml).toContain(`href=".${path.replace("/items", "")}"`);
   }
+
+  for (const term of unpublishedTerms) {
+    expect(homeHtml).not.toContain(term);
+    expect(itemsHtml).not.toContain(term);
+  }
 });
 
 test("items list does not duplicate product cards after JavaScript renders", async ({ page }) => {
@@ -111,8 +117,15 @@ test("items list does not duplicate product cards after JavaScript renders", asy
   await page.goto("/items/");
 
   await expect(page.locator(".items-entry")).toHaveCount(3);
+  await expect(page.locator(".category-card")).toHaveCount(0);
+  await expect(page.locator(".items-group")).toHaveCount(1);
+  await expect(page.getByRole("heading", { name: "時継舎で現在ご紹介している品々" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "掲載中の品" })).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
     await expect(page.locator(".items-entry", { hasText: item })).toHaveCount(1);
+  }
+  for (const term of unpublishedTerms) {
+    await expect(page.getByText(term, { exact: false })).toHaveCount(0);
   }
 
   expect(errors).toEqual([]);
@@ -123,6 +136,8 @@ test("items list shows the product card and links to its detail page", async ({ 
 
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/items/");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+  expect(overflow).toBe(false);
 
   const card = page.locator(".items-entry", { hasText: itemTitle });
   await expect(card).toBeVisible();
