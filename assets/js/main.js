@@ -246,19 +246,25 @@ async function readJson(path) {
 }
 
 async function bootstrapHomePage() {
-  try {
-    const [items, news] = await Promise.all([
-      readJson("data/items.json"),
-      readJson("data/news.json")
-    ]);
+  const itemsPromise = readJson("data/items.json")
+    .then((items) => {
+      renderHomeItems(items);
+    })
+    .catch((error) => {
+      // Keep the server-rendered static item cards visible on fetch failure.
+      console.warn("Item data could not be loaded. Keeping the static home item list as-is.", error);
+    });
 
-    renderHomeItems(items);
-    renderNews(news);
-  } catch (error) {
-    console.warn("JSON data could not be loaded. Waiting-state content is used.", error);
-    renderHomeWaitingItems();
-    renderNews(waitingNews);
-  }
+  const newsPromise = readJson("data/news.json")
+    .then((news) => {
+      renderNews(news);
+    })
+    .catch((error) => {
+      console.warn("News data could not be loaded. Waiting-state content is used.", error);
+      renderNews(waitingNews);
+    });
+
+  await Promise.all([itemsPromise, newsPromise]);
 }
 
 function getItemsDataPath() {

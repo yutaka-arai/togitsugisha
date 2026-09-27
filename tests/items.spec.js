@@ -114,12 +114,17 @@ test("items list does not duplicate product cards after JavaScript renders", asy
   const errors = collectBrowserErrors(page);
 
   await page.setViewportSize({ width: 1280, height: 900 });
+  const itemsResponse = page.waitForResponse((response) =>
+    response.url().endsWith("/data/items.json") && response.ok()
+  );
   await page.goto("/items/");
+  await itemsResponse;
 
   await expect(page.locator(".items-entry")).toHaveCount(3);
   await expect(page.locator(".category-card")).toHaveCount(0);
   await expect(page.locator(".items-group")).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "時継舎で現在ご紹介している品々" })).toBeVisible();
+  await expect(page.getByText("掲載中の品は3点です")).toBeVisible();
   await expect(page.getByRole("heading", { name: "掲載中の品" })).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
     await expect(page.locator(".items-entry", { hasText: item })).toHaveCount(1);
@@ -132,7 +137,11 @@ test("items list does not duplicate product cards after JavaScript renders", asy
 });
 
 test("items list keeps static product cards when the items JSON fetch fails", async ({ page }) => {
+  const failedItemsResponse = page.waitForResponse((response) =>
+    response.url().endsWith("/items/does-not-exist.json") && response.status() === 404
+  );
   await page.goto("/items/?itemsDataPath=does-not-exist.json");
+  await failedItemsResponse;
 
   await expect(page.locator(".items-entry")).toHaveCount(3);
   await expect(page.locator(".category-card")).toHaveCount(0);
@@ -141,6 +150,22 @@ test("items list keeps static product cards when the items JSON fetch fails", as
   await expect(page.getByText("掲載中の品は3点です")).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
     await expect(page.locator(".items-entry", { hasText: item })).toHaveCount(1);
+  }
+});
+
+test("home keeps static product cards when the items JSON fetch fails", async ({ page }) => {
+  await page.route("**/data/items.json", (route) => route.abort("failed"));
+  const failedItemsRequest = page.waitForEvent("requestfailed", (request) =>
+    request.url().endsWith("/data/items.json")
+  );
+
+  await page.goto("/");
+  await failedItemsRequest;
+
+  await expect(page.locator(".items-panel .items-entry")).toHaveCount(3);
+  await expect(page.getByRole("heading", { name: "新着の品" })).toBeVisible();
+  for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
+    await expect(page.locator(".items-panel .items-entry", { hasText: item })).toHaveCount(1);
   }
 });
 
