@@ -193,15 +193,15 @@ function renderItemsPage(items) {
     renderItemsPageWaiting({
       title: "品物はただいま準備中です",
       lead: "写真と詳細は順次掲載いたします。",
-      text: "掲載前の段階でも、分野ごとの準備状況が分かるようにご案内しています。"
+      text: "掲載前の品についても、確認できた内容から順にご紹介します。"
     });
     return;
   }
 
   status.innerHTML = `
     <div class="items-status__copy">
-      <p class="items-status__title">時継舎で現在ご紹介している品々</p>
-      <p class="items-status__lead">掲載済みの写真と詳細がある品のみを一覧にしています。</p>
+      <p class="items-status__title">掲載中の品は${items.length}点です</p>
+      <p class="items-status__lead">実物写真と詳細ページがある品のみを一覧にしています。</p>
     </div>
   `;
 
@@ -271,12 +271,9 @@ async function bootstrapItemsPage() {
     const items = await readJson(getItemsDataPath());
     renderItemsPage(items);
   } catch (error) {
-    console.warn("Item data could not be loaded. Waiting-state content is used.", error);
-    renderItemsPageWaiting({
-      title: "品物の情報を準備しています",
-      lead: "写真と詳細は順次掲載いたします。",
-      text: "ただいま掲載内容を整えています。しばらくしてからご覧ください。"
-    });
+    // Keep the server-rendered static item cards visible on fetch failure
+    // instead of replacing them with a waiting-state placeholder.
+    console.warn("Item data could not be loaded. Keeping the static item list as-is.", error);
   }
 }
 

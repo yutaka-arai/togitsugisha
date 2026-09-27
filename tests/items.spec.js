@@ -41,7 +41,7 @@ const newItems = [
 
 
 const listedItemPaths = ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/"];
-const unpublishedTerms = ["時計", "腕時計", "置時計", "掛時計", "陶磁器", "家具", "その他古物", "Coming Soon", "仮価格", "仮在庫"];
+const unpublishedTerms = ["時計", "腕時計", "置時計", "掛時計", "陶磁器", "家具", "その他古物", "古布", "Coming Soon", "仮価格", "仮在庫", "dummy"];
 
 
 const detailMetadataItems = [
@@ -129,6 +129,19 @@ test("items list does not duplicate product cards after JavaScript renders", asy
   }
 
   expect(errors).toEqual([]);
+});
+
+test("items list keeps static product cards when the items JSON fetch fails", async ({ page }) => {
+  await page.goto("/items/?itemsDataPath=does-not-exist.json");
+
+  await expect(page.locator(".items-entry")).toHaveCount(3);
+  await expect(page.locator(".category-card")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "時継舎で現在ご紹介している品々" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "掲載中の品" })).toBeVisible();
+  await expect(page.getByText("掲載中の品は3点です")).toBeVisible();
+  for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
+    await expect(page.locator(".items-entry", { hasText: item })).toHaveCount(1);
+  }
 });
 
 test("items list shows the product card and links to its detail page", async ({ page }) => {
