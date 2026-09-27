@@ -53,6 +53,27 @@ const detailMetadataItems = [
   ...newItems,
 ];
 
+test("main pages expose a single Open Graph image", async ({ page }) => {
+  const mainPages = [
+    {
+      path: "/",
+      canonical: "https://togitsugisha.com/",
+    },
+    {
+      path: "/items/",
+      canonical: "https://togitsugisha.com/items/",
+    },
+  ];
+
+  for (const pageInfo of mainPages) {
+    await page.goto(pageInfo.path);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", pageInfo.canonical);
+    await expect(page.locator('meta[property="og:image"]')).toHaveCount(1);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", "https://togitsugisha.com/assets/images/items/ukiyoe-002-main.webp");
+    await expect(page.locator('script[src="https://www.googletagmanager.com/gtag/js?id=G-M1T6XY1PRM"]')).toHaveCount(1);
+  }
+});
+
 test("item detail pages retain canonical and OGP metadata", async ({ page }) => {
   for (const item of detailMetadataItems) {
     await page.goto(item.path);
