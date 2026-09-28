@@ -4,6 +4,38 @@ const waitingNews = [
   }
 ];
 
+// Maps an item id to its matching article, for a list-level "read the
+// article" teaser. Only items with a genuinely related, already-published
+// article are listed here (ukiyoe-001 has no matching article and is
+// intentionally omitted).
+const ITEM_RELATED_ARTICLE = {
+  "ukiyoe-002": {
+    href: "../news/hiroshige-tsushima-kaigan-yubare/",
+    label: "対馬 海岸夕晴の記事を読む"
+  },
+  "ukiyoe-003": {
+    href: "../news/hiroshige-awa-kominato-uchiura/",
+    label: "安房 小湊内浦の記事を読む"
+  }
+};
+
+// Maps a news entry's href (as used in data/news.json) to its matching
+// item/list destination, for a list-level "see the item" teaser.
+const NEWS_RELATED_ITEM = {
+  "./hiroshige-tsushima-kaigan-yubare/": {
+    href: "../items/ukiyoe-002/",
+    label: "対馬 海岸夕晴の品を見る"
+  },
+  "./hiroshige-awa-kominato-uchiura/": {
+    href: "../items/ukiyoe-003/",
+    label: "安房 小湊内浦の品を見る"
+  },
+  "./hiroshige-rokuju-yoshu-meisho-zue/": {
+    href: "../items/",
+    label: "掲載中の品を見る"
+  }
+};
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -44,15 +76,16 @@ function renderHomeItems(items) {
       const description = escapeHtml(item.description || "詳細は順次公開予定です。");
       const href = item.href ? `items/${String(item.href).replace(/^\.\//, "")}` : "./items/";
       const thumb = item.thumb ? String(item.thumb).replace(/^\.\.\//, "") : "";
+      const itemId = escapeHtml(item.id || "");
       const image = thumb
-        ? `<a class="items-entry__thumb" href="${escapeHtml(href)}"><img src="${escapeHtml(thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="lazy" decoding="async"></a>`
+        ? `<a class="items-entry__thumb" href="${escapeHtml(href)}" data-ga-event="select_item" data-ga-item-id="${itemId}"><img src="${escapeHtml(thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="lazy" decoding="async"></a>`
         : "";
-      const more = `<a class="items-entry__more" href="${escapeHtml(href)}">詳しく見る<span aria-hidden="true">→</span></a>`;
+      const more = `<a class="items-entry__more" href="${escapeHtml(href)}" data-ga-event="select_item" data-ga-item-id="${itemId}">詳しく見る<span aria-hidden="true">→</span></a>`;
       return `
         <article class="items-entry">
           ${image}
           <span class="items-entry__status">${escapeHtml(item.status || "掲載中")}</span>
-          <h3><a href="${escapeHtml(href)}">${title}</a></h3>
+          <h3><a href="${escapeHtml(href)}" data-ga-event="select_item" data-ga-item-id="${itemId}">${title}</a></h3>
           <p class="items-entry__description">${description}</p>
           ${more}
         </article>
@@ -143,6 +176,10 @@ function renderNewsPage(items) {
       const href = entry.href ? escapeHtml(entry.href) : "";
       const heading = href ? `<a href="${href}">${title}</a>` : title;
       const more = href ? `<a class="news-entry__more" href="${href}">記事を読む<span aria-hidden="true">→</span></a>` : "";
+      const relatedItem = entry.href ? NEWS_RELATED_ITEM[entry.href] : null;
+      const relatedLink = relatedItem
+        ? `<a class="news-entry__related" href="${escapeHtml(relatedItem.href)}" data-ga-event="click_related_content">${escapeHtml(relatedItem.label)}</a>`
+        : "";
       return `
         <article class="news-entry">
           <div class="news-entry__meta">
@@ -153,6 +190,7 @@ function renderNewsPage(items) {
             <h3>${heading}</h3>
             <p>${body}</p>
             ${more}
+            ${relatedLink}
           </div>
         </article>
       `;
@@ -220,19 +258,25 @@ function renderItemsPage(items) {
           const title = escapeHtml(item.name || "名称確認中");
           const description = escapeHtml(item.description || "確認できた内容を掲載しています。");
           const statusText = escapeHtml(item.status || "掲載中");
+          const itemId = escapeHtml(item.id || "");
           const thumb = item.thumb
-            ? `<a class="items-entry__thumb" href="${escapeHtml(item.href || "#")}"><img src="${escapeHtml(item.thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="eager" decoding="async"></a>`
+            ? `<a class="items-entry__thumb" href="${escapeHtml(item.href || "#")}" data-ga-event="select_item" data-ga-item-id="${itemId}"><img src="${escapeHtml(item.thumb)}" alt="${escapeHtml(item.thumbAlt || item.name || "商品写真")}" loading="eager" decoding="async"></a>`
             : "";
           const more = item.href
-            ? `<a class="items-entry__more" href="${escapeHtml(item.href)}">詳しく見る<span aria-hidden="true">→</span></a>`
+            ? `<a class="items-entry__more" href="${escapeHtml(item.href)}" data-ga-event="select_item" data-ga-item-id="${itemId}">詳しく見る<span aria-hidden="true">→</span></a>`
+            : "";
+          const relatedArticle = ITEM_RELATED_ARTICLE[item.id];
+          const relatedLink = relatedArticle
+            ? `<a class="items-entry__related" href="${escapeHtml(relatedArticle.href)}" data-ga-event="click_related_content" data-ga-item-id="${itemId}">${escapeHtml(relatedArticle.label)}</a>`
             : "";
           return `
             <article class="items-entry">
               ${thumb}
               <span class="items-entry__status">${statusText}</span>
-              <h4>${item.href ? `<a href="${escapeHtml(item.href)}">${title}</a>` : title}</h4>
+              <h4>${item.href ? `<a href="${escapeHtml(item.href)}" data-ga-event="select_item" data-ga-item-id="${itemId}">${title}</a>` : title}</h4>
               <p class="items-entry__description">${description}</p>
               ${more}
+              ${relatedLink}
             </article>
           `;
         }).join("")}
@@ -323,4 +367,28 @@ function bootstrap() {
   }
 }
 
+// Delegated GA4 click tracking: any element with data-ga-event="<name>" fires
+// gtag('event', <name>, params) on click. Additional data-ga-<key> attributes
+// become event params (data-ga-item-id -> item_id). Works for both
+// server-rendered and JS-rendered content since it listens on document.
+function initAnalyticsEvents() {
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-ga-event]");
+    if (!trigger) return;
+
+    const eventName = trigger.getAttribute("data-ga-event");
+    if (!eventName || typeof gtag !== "function") return;
+
+    const params = {};
+    for (const attr of trigger.attributes) {
+      if (attr.name === "data-ga-event" || !attr.name.startsWith("data-ga-")) continue;
+      const key = attr.name.slice("data-ga-".length).replace(/-/g, "_");
+      params[key] = attr.value;
+    }
+
+    gtag("event", eventName, params);
+  });
+}
+
 bootstrap();
+initAnalyticsEvents();
