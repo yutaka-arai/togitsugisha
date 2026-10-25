@@ -40,7 +40,14 @@ const newItems = [
 ];
 
 
-const listedItemPaths = ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/"];
+const addedItems = [
+  { title: "歌川広重 名所江戸百景 霞かせき", path: "/items/ukiyoe-004/", canonical: "https://togitsugisha.com/items/ukiyoe-004/", image: "/assets/images/items/ukiyoe-004-main.webp", ogImage: "https://togitsugisha.com/assets/images/items/ukiyoe-004-main.webp" },
+  { title: "歌川広重 六十余州名所図会 美濃 養老ノ瀧", path: "/items/ukiyoe-005/", canonical: "https://togitsugisha.com/items/ukiyoe-005/", image: "/assets/images/items/ukiyoe-005-main.webp", ogImage: "https://togitsugisha.com/assets/images/items/ukiyoe-005-main.webp" },
+];
+const allNewItems = [...newItems, ...addedItems];
+
+const listedItemPaths = ["/items/ukiyoe-001/", "/items/ukiyoe-002/", "/items/ukiyoe-003/", "/items/ukiyoe-004/", "/items/ukiyoe-005/"];
+const homeItemPaths = listedItemPaths.slice(0, 4);
 const unpublishedTerms = ["時計", "腕時計", "置時計", "掛時計", "陶磁器", "家具", "その他古物", "古布", "Coming Soon", "仮価格", "仮在庫", "dummy"];
 const homeDescription = "時継舎では、現在ご紹介している浮世絵や古物を、背景や来歴とともに丁寧にご紹介します。";
 const aboutDescription = "時継舎は、現在ご紹介している古物や作品の背景を大切にし、一点ごとの物語を丁寧にお伝えしています。";
@@ -54,6 +61,7 @@ const detailMetadataItems = [
     ogImage: "https://togitsugisha.com/assets/images/items/ukiyoe-001-main.webp",
   },
   ...newItems,
+  ...addedItems,
 ];
 
 async function itemEntryCountAfterFrames(page, selector) {
@@ -127,8 +135,10 @@ test("initial HTML exposes item links before JavaScript renders", async ({ reque
   const homeHtml = await homeResponse.text();
   const itemsHtml = await itemsResponse.text();
 
-  for (const path of listedItemPaths) {
+  for (const path of homeItemPaths) {
     expect(homeHtml).toContain(`href=".${path}"`);
+  }
+  for (const path of listedItemPaths) {
     expect(itemsHtml).toContain(`href=".${path.replace("/items", "")}"`);
   }
 
@@ -152,7 +162,7 @@ test("home item and news sections render after successful JavaScript data loads"
 
   await expect(page.locator("#item-grid")).toHaveAttribute("data-items-render-state", "loaded");
   await expect(page.locator("#news-list")).toHaveAttribute("data-news-render-state", "loaded");
-  await expect(page.locator(".items-panel .items-entry")).toHaveCount(3);
+  await expect(page.locator(".items-panel .items-entry")).toHaveCount(4);
   await expect(page.locator(".news-list__item")).toHaveCount(3);
   await expect(page.getByText("歌川広重が日本各地の名所を描いた")).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
@@ -172,12 +182,12 @@ test("items list does not duplicate product cards after JavaScript renders", asy
   await itemsResponse;
 
   await expect(page.locator("#items-status")).toHaveAttribute("data-items-render-state", "loaded");
-  await expect(page.locator(".items-entry")).toHaveCount(3);
-  await expect.poll(() => itemEntryCountAfterFrames(page, ".items-entry")).toBe(3);
+  await expect(page.locator(".items-entry")).toHaveCount(5);
+  await expect.poll(() => itemEntryCountAfterFrames(page, ".items-entry")).toBe(5);
   await expect(page.locator(".category-card")).toHaveCount(0);
   await expect(page.locator(".items-group")).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "時継舎で現在ご紹介している品々" })).toBeVisible();
-  await expect(page.getByText("掲載中の品は3点です")).toBeVisible();
+  await expect(page.getByText("掲載中の品は5点です")).toBeVisible();
   await expect(page.getByRole("heading", { name: "掲載中の品" })).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
     await expect(page.locator(".items-entry", { hasText: item })).toHaveCount(1);
@@ -196,11 +206,11 @@ test("items list keeps static product cards when the items JSON fetch fails", as
   await page.goto("/items/?itemsDataPath=does-not-exist.json");
   await failedItemsResponse;
 
-  await expect(page.locator(".items-entry")).toHaveCount(3);
+  await expect(page.locator(".items-entry")).toHaveCount(5);
   await expect(page.locator(".category-card")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "時継舎で現在ご紹介している品々" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "掲載中の品" })).toBeVisible();
-  await expect(page.getByText("掲載中の品は3点です")).toBeVisible();
+  await expect(page.getByText("掲載中の品は5点です")).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
     await expect(page.locator(".items-entry", { hasText: item })).toHaveCount(1);
   }
@@ -216,8 +226,8 @@ test("home keeps static product cards when the items JSON fetch fails", async ({
   await failedItemsRequest;
 
   await expect(page.locator("#item-grid")).toHaveAttribute("data-items-render-state", "fallback");
-  await expect(page.locator(".items-panel .items-entry")).toHaveCount(3);
-  await expect.poll(() => itemEntryCountAfterFrames(page, ".items-panel .items-entry")).toBe(3);
+  await expect(page.locator(".items-panel .items-entry")).toHaveCount(4);
+  await expect.poll(() => itemEntryCountAfterFrames(page, ".items-panel .items-entry")).toBe(4);
   await expect(page.getByRole("heading", { name: "新着の品" })).toBeVisible();
   for (const item of [itemTitle, ...newItems.map((entry) => entry.title)]) {
     await expect(page.locator(".items-panel .items-entry", { hasText: item })).toHaveCount(1);
@@ -238,7 +248,7 @@ test("home keeps products and falls back only news when the news JSON fetch fail
 
   await expect(page.locator("#item-grid")).toHaveAttribute("data-items-render-state", "loaded");
   await expect(page.locator("#news-list")).toHaveAttribute("data-news-render-state", "fallback");
-  await expect(page.locator(".items-panel .items-entry")).toHaveCount(3);
+  await expect(page.locator(".items-panel .items-entry")).toHaveCount(4);
   await expect(page.locator(".news-list__item")).toHaveCount(1);
   await expect(page.locator(".news-list__item--waiting")).toHaveCount(1);
   await expect(page.getByText("ただいまホームページを準備しています。")).toBeVisible();
@@ -333,7 +343,7 @@ test("new ukiyoe items appear in list and expose detail metadata", async ({ page
   expect(errors).toEqual([]);
 });
 
-for (const item of newItems) {
+for (const item of allNewItems) {
   test(`${item.title} detail page holds up at 390px`, async ({ page, request }) => {
     const errors = collectBrowserErrors(page);
 
@@ -341,7 +351,13 @@ for (const item of newItems) {
     await page.goto(item.path);
 
     await expect(page.getByRole("heading", { name: item.title })).toBeVisible();
-    await expect(page.locator(".subhero__lead")).toContainText("「六十余州名所図会」シリーズの一図です。");
+    if (item.path.endsWith("ukiyoe-004/")) {
+      await expect(page.locator(".subhero__lead")).toContainText("「名所江戸百景」の一図として");
+    } else if (item.path.endsWith("ukiyoe-005/")) {
+      await expect(page.locator(".subhero__lead")).toContainText("「六十余州名所図会」の一図として");
+    } else {
+      await expect(page.locator(".subhero__lead")).toContainText("「六十余州名所図会」シリーズの一図です。");
+    }
 
     const image = page.locator(".item-detail__figure img");
     await expect(image).toBeVisible();
