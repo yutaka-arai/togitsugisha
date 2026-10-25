@@ -118,7 +118,8 @@ function renderNews(items, renderState = "loaded") {
       const text = escapeHtml(entry.text || entry.title || "ただいまホームページを準備しています。");
       const displayDate = formatDisplayDate(entry.date);
       const href = entry.href ? escapeHtml(entry.href) : "";
-      const body = href ? `<a href="news/${href.replace(/^\.\//, "")}">${text}</a>` : text;
+      const homeHref = href.startsWith("../items/") ? href.slice(3) : `news/${href.replace(/^\.\//, "")}`;
+      const body = href ? `<a href="${homeHref}">${text}</a>` : text;
       return `
         <li class="news-list__item${entry.date ? "" : " news-list__item--waiting"}">
           ${entry.date ? `<time datetime="${escapeHtml(entry.date)}">${displayDate}</time>` : ""}
@@ -175,7 +176,8 @@ function renderNewsPage(items) {
       const body = escapeHtml(entry.body || entry.text || "詳細は順次ご案内いたします。");
       const href = entry.href ? escapeHtml(entry.href) : "";
       const heading = href ? `<a href="${href}">${title}</a>` : title;
-      const more = href ? `<a class="news-entry__more" href="${href}">記事を読む<span aria-hidden="true">→</span></a>` : "";
+      const moreLabel = entry.category === "新着商品" ? "品を見る" : "記事を読む";
+      const more = href ? `<a class="news-entry__more" href="${href}">${moreLabel}<span aria-hidden="true">→</span></a>` : "";
       const relatedItem = entry.href ? NEWS_RELATED_ITEM[entry.href] : null;
       const relatedLink = relatedItem
         ? `<a class="news-entry__related" href="${escapeHtml(relatedItem.href)}" data-ga-event="click_related_content">${escapeHtml(relatedItem.label)}</a>`
